@@ -1,0 +1,375 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Слот</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: рабочий инструмент — тёмная боковая панель, сетка расписания по мастерам как главный экран */
+:root{
+  --bg:#f5f5f2; --panel:#ffffff; --ink:#17171b; --muted:#6c6c74; --line:#e4e3de; --soft:#efeee9;
+  --acc:#ff5f2e; --acc-soft:#ffe6dc; --side:#17171b;
+  --s1:#ffe6dc; --s1b:#ff5f2e; --s2:#e3ecff; --s2b:#3c6df0; --s3:#e5f5e8; --s3b:#2f9e57; --s4:#f4e8ff; --s4b:#8d4fd8;
+  --ok:#2f9e57; --warn:#c98a0b; --bad:#d6413a;
+  --f:"IBM Plex Sans",system-ui,"Segoe UI",sans-serif; --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font:14px/1.5 var(--f);-webkit-font-smoothing:antialiased;display:flex;flex-direction:column}
+h1,h2,h3{margin:0;font-weight:600;letter-spacing:-.015em;line-height:1.2}
+p{margin:0}
+button{font:inherit;color:inherit;cursor:pointer}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.concept{background:#000;color:#bdbdc4;font:12px/1.4 var(--mono);text-align:center;padding:8px 16px;flex:0 0 auto}
+.concept a{color:#fff}
+
+.app{flex:1;display:grid;grid-template-columns:232px minmax(0,1fr);min-height:0}
+.side{background:var(--side);color:#d8d8de;display:flex;flex-direction:column;padding:20px 14px;gap:24px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:20px;color:#fff;padding-inline:8px;letter-spacing:-.02em}
+.brand i{width:28px;height:28px;border-radius:8px;background:var(--acc);display:grid;grid-template-columns:1fr 1fr;gap:3px;padding:6px}
+.brand i b{background:rgba(255,255,255,.95);border-radius:2px}
+.brand i b:nth-child(2){opacity:.45}
+.nav{display:grid;gap:2px}
+.nav button{border:0;background:none;display:flex;align-items:center;gap:12px;padding:10px 10px;border-radius:10px;color:#b4b4bc;text-align:left;font-weight:500}
+.nav button svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
+.nav button:hover{background:rgba(255,255,255,.06);color:#fff}
+.nav button[aria-current="page"]{background:rgba(255,255,255,.1);color:#fff}
+.nav .cnt{margin-left:auto;font:500 11px var(--mono);background:var(--acc);color:#fff;border-radius:6px;padding:1px 6px}
+.side .biz{margin-top:auto;display:flex;gap:10px;align-items:center;padding:10px;border-radius:12px;background:rgba(255,255,255,.05)}
+.side .biz span{width:34px;height:34px;border-radius:10px;background:#fff;color:var(--ink);display:grid;place-items:center;font-weight:700}
+.side .biz small{display:block;color:#8d8d96;font-size:12px}
+
+.main{min-width:0;display:flex;flex-direction:column;min-height:0}
+.bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding:16px clamp(16px,2.4vw,28px);border-bottom:1px solid var(--line);background:var(--panel)}
+.bar h1{font-size:20px}
+.bar .sub{color:var(--muted);font-size:13px}
+.datenav{display:flex;align-items:center;gap:6px}
+.ib{width:34px;height:34px;border-radius:9px;border:1px solid var(--line);background:var(--panel);display:grid;place-items:center}
+.ib svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+.pillbtn{border:1px solid var(--line);background:var(--panel);border-radius:9px;padding:7px 12px;font-weight:500}
+.btn{border:0;border-radius:10px;padding:10px 16px;font-weight:600;display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.btn-acc{background:var(--acc);color:#fff}
+.btn-acc:hover{background:#ec4f1f}
+.btn-ink{background:var(--ink);color:#fff}
+.btn-line{background:var(--panel);border:1px solid var(--line)}
+.btn-bad{background:#fdeceb;color:var(--bad)}
+.content{flex:1;overflow:auto;padding:clamp(16px,2.4vw,28px);display:grid;gap:16px;align-content:start}
+
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;display:grid;gap:6px}
+.kpi span{color:var(--muted);font-size:13px}
+.kpi b{font:500 26px/1.1 var(--mono);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.kpi small{font-size:12px;color:var(--muted)}
+.kpi .meter{height:6px;background:var(--soft);border-radius:3px;overflow:hidden}
+.kpi .meter i{display:block;height:100%;background:var(--acc)}
+@media (max-width:1100px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;min-width:0}
+.card-h{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line)}
+.card-h h2{font-size:15px}
+.legend{display:flex;flex-wrap:wrap;gap:12px;color:var(--muted);font-size:12px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:10px;height:10px;border-radius:3px;background:var(--c)}
+
+/* Schedule */
+.sched-wrap{overflow-x:auto}
+.sched{display:grid;grid-template-columns:64px repeat(3,minmax(200px,1fr));min-width:680px;position:relative}
+.sched .mh{position:sticky;top:0;background:var(--panel);z-index:3;padding:12px;border-bottom:1px solid var(--line);border-left:1px solid var(--line);display:flex;gap:10px;align-items:center}
+.sched .mh .av{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-weight:600;color:#fff;font-size:13px}
+.sched .mh b{display:block;font-size:14px}
+.sched .mh small{color:var(--muted);font-size:12px}
+.sched .corner{border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--panel);z-index:3}
+.times{display:grid;padding-top:0}
+.times div:first-child{transform:none;padding-top:4px}
+.times div{height:64px;font:12px var(--mono);color:var(--muted);text-align:right;padding:0 10px;transform:translateY(-8px)}
+.col{position:relative;border-left:1px solid var(--line)}
+.slot{height:32px;border-bottom:1px solid transparent;display:block;width:100%;background:none;border-left:0;border-right:0;border-top:0;padding:0}
+.slot:nth-child(2n){border-bottom-color:var(--line)}
+.slot:nth-child(2n+1){border-bottom:1px dashed #efeee9}
+.slot:hover{background:var(--acc-soft)}
+.slot:hover::after{content:"+ Записать";font-size:11px;color:var(--acc);font-weight:600;padding-left:8px}
+.bk{position:absolute;left:6px;right:6px;border-radius:9px;padding:5px 9px;line-height:1.3;background:var(--c);border-left:3px solid var(--cb);overflow:hidden;text-align:left;border-top:0;border-right:0;border-bottom:0;display:grid;align-content:start;gap:1px;z-index:1}
+.bk b{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bk span{font-size:12px;color:#4b4b52;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bk small{font:11px var(--mono);color:#4b4b52}
+.bk.cancel{background:repeating-linear-gradient(135deg,#f3f2ee 0 6px,#eae9e4 6px 12px);border-left-color:#b9b8b2;opacity:.8}
+.bk.cancel b{text-decoration:line-through}
+.bk.came::after{content:"✓";position:absolute;top:6px;right:8px;font-weight:700;color:var(--ok)}
+.bk.sel{outline:2px solid var(--ink);outline-offset:1px}
+.now{position:absolute;left:0;right:0;height:2px;background:var(--acc);z-index:2;pointer-events:none}
+.now::before{content:"";position:absolute;left:-4px;top:-3px;width:8px;height:8px;border-radius:50%;background:var(--acc)}
+
+/* Tables */
+.tools{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.search{display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:0 12px;min-width:min(320px,100%)}
+.search svg{width:16px;height:16px;fill:none;stroke:var(--muted);stroke-width:2;stroke-linecap:round}
+.search input{border:0;outline:none;background:none;font:inherit;padding:10px 0;flex:1;min-width:0;color:var(--ink)}
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:640px}
+th{font-weight:500;color:var(--muted);font-size:12px;text-align:left;padding:10px 16px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:12px 16px;border-bottom:1px solid var(--line);white-space:nowrap}
+tr:last-child td{border-bottom:0}
+td.num,th.num{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}
+.who{display:flex;gap:10px;align-items:center}
+.who i{width:30px;height:30px;border-radius:50%;background:var(--soft);display:grid;place-items:center;font-style:normal;font-weight:600;font-size:12px}
+.tag{display:inline-block;font-size:12px;font-weight:500;padding:2px 8px;border-radius:6px;background:var(--soft)}
+.tag.vip{background:var(--acc-soft);color:#b8401a}
+.tag.new{background:var(--s3);color:#1f7a41}
+.tag.lost{background:#f5ecd9;color:#8a5e05}
+
+/* Analytics */
+.an{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:16px}
+@media (max-width:1100px){.an{grid-template-columns:1fr}}
+.chart{padding:16px}
+.chart svg{width:100%;height:auto;display:block}
+.chart text{font:11px var(--mono);fill:var(--muted)}
+.chart .lbl{fill:var(--ink);font-weight:500}
+.rank{padding:8px 16px 16px;display:grid;gap:12px}
+.rank div{display:grid;gap:6px}
+.rank .r{display:flex;justify-content:space-between;gap:10px;font-size:13px}
+.rank .r b{font:500 13px var(--mono)}
+.rank .meter{height:8px;background:var(--soft);border-radius:4px;overflow:hidden}
+.rank .meter i{display:block;height:100%;border-radius:4px;background:var(--cb)}
+
+/* Services */
+.svc-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:1000px){.svc-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.svc-grid{grid-template-columns:1fr}}
+.svc{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;display:grid;gap:10px;border-top:4px solid var(--cb)}
+.svc .r{display:flex;justify-content:space-between;color:var(--muted);font-size:13px}
+.svc .r b{color:var(--ink);font:500 14px var(--mono)}
+
+/* Modal + drawer */
+.scrim{position:fixed;inset:0;background:rgba(23,23,27,.45);z-index:40}
+.modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(460px,calc(100vw - 32px));max-height:calc(100vh - 32px);overflow:auto;background:var(--panel);border-radius:18px;z-index:41;padding:22px;display:grid;gap:14px}
+.modal h2{font-size:18px}
+.f{display:grid;gap:6px}
+.f label{font-size:12px;font-weight:500;color:var(--muted)}
+.f input,.f select{font:inherit;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--panel);color:var(--ink);width:100%}
+.f input:focus,.f select:focus{outline:none;border-color:var(--acc)}
+.f.bad input{border-color:var(--bad)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.err{color:var(--bad);font-size:13px}
+.mfoot{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(380px,100vw);background:var(--panel);z-index:41;border-left:1px solid var(--line);display:flex;flex-direction:column;box-shadow:-20px 0 40px -20px rgba(0,0,0,.2)}
+.dh{display:flex;justify-content:space-between;align-items:center;padding:16px 18px;border-bottom:1px solid var(--line)}
+.db{padding:18px;display:grid;gap:14px;align-content:start;overflow:auto;flex:1}
+.kv{display:grid;grid-template-columns:110px 1fr;gap:8px 12px;font-size:14px}
+.kv span{color:var(--muted)}
+.status-seg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.status-seg button{border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:9px 6px;font-weight:500;font-size:13px}
+.status-seg button[aria-pressed="true"][data-s="ok"]{background:var(--s2);border-color:var(--s2b);color:#2448b8}
+.status-seg button[aria-pressed="true"][data-s="came"]{background:var(--s3);border-color:var(--s3b);color:#1f7a41}
+.status-seg button[aria-pressed="true"][data-s="cancel"]{background:#fdeceb;border-color:var(--bad);color:var(--bad)}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:10px;z-index:60;font-size:14px}
+
+@media (max-width:860px){
+  .app{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) auto}
+  .side{order:2;flex-direction:row;padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px));gap:0}
+  .brand,.side .biz{display:none}
+  .nav{grid-template-columns:repeat(4,1fr);width:100%}
+  .nav button{flex-direction:column;gap:3px;font-size:11px;padding:8px 4px;text-align:center;justify-content:center}
+  .nav .cnt{display:none}
+  .bar h1{font-size:18px}
+}
+@media (max-width:520px){.kpi b{font-size:22px}.two{grid-template-columns:1fr}.bar .btn-acc .t{display:none}}
+</style>
+
+<div class="concept">Концепт-проект qwe studio: дизайн и разработка веб-приложения. Салон и клиенты вымышлены, данные хранятся только в вашем браузере. <a href="../../">← на сайт студии</a></div>
+
+<div class="app">
+  <aside class="side">
+    <div class="brand"><i aria-hidden="true"><b></b><b></b><b></b><b></b></i>Слот</div>
+    <nav class="nav" aria-label="Разделы">
+      <button type="button" data-v="sched"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Расписание<span class="cnt" id="navCnt">0</span></button>
+      <button type="button" data-v="clients"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c1-3.5 3.5-5 6.5-5s5.5 1.5 6.5 5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 15c2 .6 3.2 2.2 3.5 5"/></svg>Клиенты</button>
+      <button type="button" data-v="stats"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Аналитика</button>
+      <button type="button" data-v="svc"><svg viewBox="0 0 24 24"><path d="M6 3l3 9M18 3l-3 9"/><circle cx="7" cy="17" r="3"/><circle cx="17" cy="17" r="3"/></svg>Услуги</button>
+    </nav>
+    <div class="biz"><span>Л</span><div><b style="color:#fff;font-weight:500">Салон «Лён»</b><small>Тариф «Команда»</small></div></div>
+  </aside>
+  <div class="main">
+    <div class="bar" id="bar"></div>
+    <div class="content" id="content"></div>
+  </div>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle" hidden></div>
+<aside class="drawer" id="drawer" hidden aria-label="Запись"></aside>
+
+<script>
+(function(){
+  var MASTERS=[{id:'a',n:'Анна Котова',r:'Парикмахер',c:'#ff5f2e'},{id:'i',n:'Ирина Белова',r:'Мастер маникюра',c:'#8d4fd8'},{id:'o',n:'Олег Седов',r:'Барбер',c:'#3c6df0'}];
+  var SVC=[
+    {id:'cutw',n:'Стрижка женская',d:60,p:1800,m:'a',k:1},{id:'color',n:'Окрашивание',d:120,p:4500,m:'a',k:1},{id:'style',n:'Укладка',d:45,p:1200,m:'a',k:1},
+    {id:'mani',n:'Маникюр с покрытием',d:90,p:1600,m:'i',k:4},{id:'pedi',n:'Педикюр',d:90,p:2000,m:'i',k:4},{id:'mani2',n:'Маникюр без покрытия',d:45,p:900,m:'i',k:4},
+    {id:'cutm',n:'Стрижка мужская',d:45,p:1200,m:'o',k:2},{id:'beard',n:'Стрижка бороды',d:30,p:800,m:'o',k:2},{id:'combo',n:'Стрижка и борода',d:75,p:1800,m:'o',k:3}
+  ];
+  var KC={1:['var(--s1)','var(--s1b)','Волосы'],2:['var(--s2)','var(--s2b)','Барбер'],3:['var(--s3)','var(--s3b)','Комплекс'],4:['var(--s4)','var(--s4b)','Ногти']};
+  var CLIENTS=['Мария Иванова','Ольга Петрова','Дмитрий Орлов','Екатерина Смирнова','Анастасия Волкова','Сергей Кузнецов','Татьяна Морозова','Алексей Новиков','Юлия Фёдорова','Наталья Соколова','Игорь Лебедев','Полина Зайцева','Виктория Павлова','Максим Егоров'];
+  var START=9, END=21, SLOT=30, PX=32;
+  function svc(id){for(var i=0;i<SVC.length;i++)if(SVC[i].id===id)return SVC[i];}
+  function rub(n){return n.toLocaleString('ru-RU')+' ₽';}
+  function hm(min){return Math.floor(min/60)+':'+String(min%60).padStart(2,'0');}
+  function dkey(d){return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();}
+  function phone(i){return '+7 9'+String(10+i*7%89).padStart(2,'0')+' '+String(100+i*37%900)+'-'+String(10+i*13%89)+'-'+String(10+i*29%89);}
+  function rng(seed){return function(){seed=(seed*9301+49297)%233280;return seed/233280;};}
+
+  var today=new Date();today.setHours(0,0,0,0);
+  var store={};try{store=JSON.parse(localStorage.getItem('slot-data')||'{}')||{};}catch(e){store={};}
+  function save(){try{localStorage.setItem('slot-data',JSON.stringify(store));}catch(e){}}
+  function genDay(d){
+    var k=dkey(d);if(store[k])return store[k];
+    var r=rng(d.getDate()*31+d.getMonth()*7+3),list=[],uid=0;
+    MASTERS.forEach(function(m){
+      var t=START*60+(r()<.5?0:30);var opts=SVC.filter(function(s){return s.m===m.id;});
+      while(t<END*60-30){
+        if(r()<.28){t+=SLOT;continue;}
+        var s=opts[Math.floor(r()*opts.length)];if(t+s.d>END*60)break;
+        var past=d<today||(+d===+today&&t+s.d<=nowMin());
+        list.push({id:k+'-'+(uid++),m:m.id,s:s.id,t:t,c:CLIENTS[Math.floor(r()*CLIENTS.length)],st:past?(r()<.08?'cancel':'came'):(r()<.05?'cancel':'ok')});
+        t+=Math.ceil(s.d/SLOT)*SLOT;
+      }
+    });
+    store[k]=list;return list;
+  }
+  function nowMin(){var n=new Date();return n.getHours()*60+n.getMinutes();}
+
+  var V={view:'sched',day:new Date(today),sel:null,q:''};
+  var bar=document.getElementById('bar'), content=document.getElementById('content');
+  var DN=['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'];
+  function show(v){V.view=v;closeAll();render();}
+  function render(){
+    document.querySelectorAll('.nav button').forEach(function(b){b.setAttribute('aria-current',b.dataset.v===V.view?'page':'false');});
+    var t=genDay(today).filter(function(b){return b.st!=='cancel';}).length;document.getElementById('navCnt').textContent=t;
+    ({sched:sched,clients:clients,stats:stats,svc:services})[V.view]();
+  }
+
+  // Schedule
+  function sched(){
+    var d=V.day,isToday=+d===+today,list=genDay(d);
+    var title=isToday?'Сегодня':d.toLocaleDateString('ru-RU',{day:'numeric',month:'long'});
+    bar.innerHTML='<div><h1>'+title+'</h1><span class="sub">'+DN[d.getDay()]+', '+d.toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'})+'</span></div><div class="datenav"><button class="ib" type="button" id="prev" aria-label="Предыдущий день"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><button class="pillbtn" type="button" id="tday">Сегодня</button><button class="ib" type="button" id="next" aria-label="Следующий день"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button><button class="btn btn-acc" type="button" id="newB">+ <span class="t">Новая запись</span></button></div>';
+    document.getElementById('prev').onclick=function(){V.day.setDate(V.day.getDate()-1);closeAll();sched();};
+    document.getElementById('next').onclick=function(){V.day.setDate(V.day.getDate()+1);closeAll();sched();};
+    document.getElementById('tday').onclick=function(){V.day=new Date(today);closeAll();sched();};
+    document.getElementById('newB').onclick=function(){openNew(null,null);};
+    var act=list.filter(function(b){return b.st!=='cancel';});
+    var rev=act.reduce(function(s,b){return s+svc(b.s).p;},0);
+    var busy=act.reduce(function(s,b){return s+svc(b.s).d;},0), cap=MASTERS.length*(END-START)*60;
+    var came=list.filter(function(b){return b.st==='came';}).length, canc=list.length-act.length;
+    var left=act.filter(function(b){return b.st==='ok';}).length;
+    content.innerHTML='<div class="kpis">'+
+      '<div class="kpi"><span>Записей</span><b>'+act.length+'</b><small>'+(isToday?'ещё впереди: '+left:'отмен: '+canc)+'</small></div>'+
+      '<div class="kpi"><span>Выручка по записям</span><b>'+rub(rev)+'</b><small>средний чек '+rub(act.length?Math.round(rev/act.length/10)*10:0)+'</small></div>'+
+      '<div class="kpi"><span>Загрузка мастеров</span><b>'+Math.round(busy/cap*100)+'%</b><div class="meter"><i style="width:'+Math.round(busy/cap*100)+'%"></i></div></div>'+
+      '<div class="kpi"><span>Пришли</span><b>'+came+'</b><small>отмен: '+canc+'</small></div></div>'+
+      '<div class="card"><div class="card-h"><h2>Расписание мастеров</h2><div class="legend">'+[1,2,3,4].map(function(k){return '<span><i style="--c:'+KC[k][1]+'"></i>'+KC[k][2]+'</span>';}).join('')+'<span>Нажмите на свободное время, чтобы записать</span></div></div><div class="sched-wrap"><div class="sched" id="grid"></div></div></div>';
+    var g=document.getElementById('grid'),h='<div class="corner"></div>';
+    MASTERS.forEach(function(m){h+='<div class="mh"><span class="av" style="background:'+m.c+'">'+m.n[0]+'</span><span><b>'+m.n+'</b><small>'+m.r+'</small></span></div>';});
+    h+='<div class="times">';for(var t=START;t<END;t++)h+='<div>'+t+':00</div>';h+='</div>';
+    MASTERS.forEach(function(m){
+      h+='<div class="col" data-m="'+m.id+'">';
+      for(var s=START*60;s<END*60;s+=SLOT)h+='<button class="slot" type="button" data-t="'+s+'" aria-label="Записать к '+m.n+' на '+hm(s)+'"></button>';
+      list.filter(function(b){return b.m===m.id;}).forEach(function(b){var sv=svc(b.s),kc=KC[sv.k];h+='<button type="button" class="bk '+(b.st==='cancel'?'cancel':b.st==='came'?'came':'')+(V.sel===b.id?' sel':'')+'" data-id="'+b.id+'" style="top:'+((b.t-START*60)/SLOT*PX+1)+'px;height:'+(sv.d/SLOT*PX-3)+'px;--c:'+kc[0]+';--cb:'+kc[1]+'"><b>'+b.c+'</b>'+(sv.d>=60?'<span>'+sv.n+'</span>':'')+(sv.d>=45?'<small>'+hm(b.t)+'–'+hm(b.t+sv.d)+'</small>':'')+'</button>';});
+      if(isToday){var nm=nowMin();if(nm>START*60&&nm<END*60)h+='<div class="now" style="top:'+((nm-START*60)/SLOT*PX)+'px"></div>';}
+      h+='</div>';
+    });
+    g.innerHTML=h;
+    g.querySelectorAll('.slot').forEach(function(s){s.onclick=function(){openNew(s.parentNode.dataset.m,+s.dataset.t);};});
+    g.querySelectorAll('.bk').forEach(function(b){b.onclick=function(){openBk(b.dataset.id);};});
+  }
+
+  function closeAll(){document.getElementById('scrim').hidden=true;document.getElementById('modal').hidden=true;document.getElementById('drawer').hidden=true;V.sel=null;}
+  document.getElementById('scrim').onclick=function(){closeAll();if(V.view==='sched')sched();};
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeAll();if(V.view==='sched')sched();}});
+
+  function fits(list,m,t,d,skip){return t>=START*60&&t+d<=END*60&&!list.some(function(b){if(b.m!==m||b.st==='cancel'||b.id===skip)return false;var bd=svc(b.s).d;return t<b.t+bd&&b.t<t+d;});}
+  function openNew(m,t){
+    var list=genDay(V.day),md=document.getElementById('modal');
+    m=m||'a';var opts=function(mm){return SVC.filter(function(s){return s.m===mm;}).map(function(s){return '<option value="'+s.id+'">'+s.n+' · '+s.d+' мин · '+rub(s.p)+'</option>';}).join('');};
+    var times='';for(var x=START*60;x<END*60;x+=SLOT)times+='<option value="'+x+'"'+(x===t?' selected':'')+'>'+hm(x)+'</option>';
+    md.innerHTML='<h2 id="mTitle">Новая запись</h2><p style="color:var(--muted);margin-top:-8px">'+V.day.toLocaleDateString('ru-RU',{weekday:'long',day:'numeric',month:'long'})+'</p>'+
+      '<div class="two"><div class="f" id="fc"><label for="nc">Клиент</label><input id="nc" list="cl" placeholder="Имя и фамилия" autocomplete="off"><datalist id="cl">'+CLIENTS.map(function(c){return '<option value="'+c+'">';}).join('')+'</datalist></div><div class="f"><label for="np">Телефон</label><input id="np" type="tel" placeholder="+7"></div></div>'+
+      '<div class="f"><label for="nm">Мастер</label><select id="nm">'+MASTERS.map(function(x){return '<option value="'+x.id+'"'+(x.id===m?' selected':'')+'>'+x.n+' · '+x.r+'</option>';}).join('')+'</select></div>'+
+      '<div class="f"><label for="ns">Услуга</label><select id="ns">'+opts(m)+'</select></div>'+
+      '<div class="f"><label for="nt">Время</label><select id="nt">'+times+'</select></div>'+
+      '<p class="err" id="nerr" aria-live="polite"></p><div class="mfoot"><button class="btn btn-line" type="button" id="nx">Отмена</button><button class="btn btn-acc" type="button" id="ns2">Записать</button></div>';
+    md.hidden=false;document.getElementById('scrim').hidden=false;document.getElementById('drawer').hidden=true;
+    document.getElementById('nm').onchange=function(e){document.getElementById('ns').innerHTML=opts(e.target.value);};
+    document.getElementById('nx').onclick=function(){closeAll();};
+    document.getElementById('ns2').onclick=function(){
+      var c=document.getElementById('nc').value.trim(),mm=document.getElementById('nm').value,s=svc(document.getElementById('ns').value),tt=+document.getElementById('nt').value,err=document.getElementById('nerr');
+      document.getElementById('fc').classList.remove('bad');
+      if(!c){err.textContent='Укажите имя клиента';document.getElementById('fc').classList.add('bad');document.getElementById('nc').focus();return;}
+      if(!fits(list,mm,tt,s.d)){err.textContent='Это время у мастера занято или выходит за рабочий день. Выберите другое.';return;}
+      var b={id:dkey(V.day)+'-n'+Date.now(),m:mm,s:s.id,t:tt,c:c,st:'ok'};list.push(b);save();closeAll();V.view='sched';render();toast('Записали: '+c+', '+hm(tt));
+    };
+    setTimeout(function(){document.getElementById('nc').focus();},30);
+  }
+  function openBk(id){
+    var list=genDay(V.day),b=null;list.forEach(function(x){if(x.id===id)b=x;});if(!b)return;
+    var sv=svc(b.s),m=MASTERS.filter(function(x){return x.id===b.m;})[0],dr=document.getElementById('drawer');
+    V.sel=id;sched();
+    dr.innerHTML='<div class="dh"><h2>Запись</h2><button class="ib" type="button" id="dx" aria-label="Закрыть"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div><div class="db">'+
+      '<div class="who"><i>'+b.c.split(' ').map(function(w){return w[0];}).join('')+'</i><div><b style="font-size:16px">'+b.c+'</b><div style="color:var(--muted);font-size:13px">'+phone(CLIENTS.indexOf(b.c)+1)+'</div></div></div>'+
+      '<div class="kv"><span>Услуга</span><b style="font-weight:500">'+sv.n+'</b><span>Мастер</span><b style="font-weight:500">'+m.n+'</b><span>Время</span><b style="font-weight:500;font-family:var(--mono)">'+hm(b.t)+'–'+hm(b.t+sv.d)+'</b><span>Стоимость</span><b style="font-weight:500;font-family:var(--mono)">'+rub(sv.p)+'</b></div>'+
+      '<div class="f"><label>Статус</label><div class="status-seg"><button type="button" data-s="ok">Ожидается</button><button type="button" data-s="came">Пришёл</button><button type="button" data-s="cancel">Отмена</button></div></div>'+
+      '<button class="btn btn-bad" type="button" id="del" style="justify-self:start">Удалить запись</button></div>';
+    dr.hidden=false;document.getElementById('scrim').hidden=true;document.getElementById('modal').hidden=true;
+    function paint(){dr.querySelectorAll('.status-seg button').forEach(function(x){x.setAttribute('aria-pressed',String(x.dataset.s===b.st));});}
+    paint();
+    dr.querySelectorAll('.status-seg button').forEach(function(x){x.onclick=function(){b.st=x.dataset.s;save();paint();sched();render();};});
+    document.getElementById('dx').onclick=function(){closeAll();sched();};
+    var armed=false;document.getElementById('del').onclick=function(e){if(!armed){armed=true;e.target.textContent='Нажмите ещё раз, чтобы удалить';return;}list.splice(list.indexOf(b),1);save();closeAll();render();toast('Запись удалена');};
+  }
+
+  // Clients
+  function clientStats(){
+    var res={};CLIENTS.forEach(function(c,i){res[c]={n:c,ph:phone(i+1),v:0,sum:0,last:null};});
+    for(var k=-45;k<=0;k++){var d=new Date(today);d.setDate(d.getDate()+k);genDay(d).forEach(function(b){if(b.st==='cancel'||!res[b.c])return;if(k===0&&b.st!=='came')return;var r=res[b.c];r.v++;r.sum+=svc(b.s).p;if(!r.last||d>r.last)r.last=new Date(d);});}
+    save();return Object.keys(res).map(function(k){return res[k];});
+  }
+  function clients(){
+    bar.innerHTML='<div><h1>Клиенты</h1><span class="sub">Визиты за последние 45 дней</span></div>';
+    var rows=clientStats().sort(function(a,b){return b.sum-a.sum;});
+    content.innerHTML='<div class="tools"><label class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="q" placeholder="Поиск по имени или телефону" value="'+V.q+'"></label><span style="color:var(--muted)" id="qc"></span></div><div class="card tbl-wrap"><table><thead><tr><th>Клиент</th><th>Телефон</th><th class="num">Визитов</th><th>Последний визит</th><th class="num">Потратил</th><th>Сегмент</th></tr></thead><tbody id="tb"></tbody></table></div>';
+    function draw(){
+      var q=V.q.toLowerCase(),f=rows.filter(function(r){return !q||r.n.toLowerCase().indexOf(q)>=0||r.ph.replace(/\D/g,'').indexOf(q.replace(/\D/g,'')||'#')>=0;});
+      document.getElementById('qc').textContent=f.length+' из '+rows.length;
+      document.getElementById('tb').innerHTML=f.length?f.map(function(r,i){var days=r.last?Math.round((today-r.last)/864e5):null;var tag=r.sum>=12000?'<span class="tag vip">Постоянный</span>':r.v<=1?'<span class="tag new">Новый</span>':days!==null&&days>21?'<span class="tag lost">Давно не был</span>':'<span class="tag">Обычный</span>';return '<tr><td><span class="who"><i>'+r.n.split(' ').map(function(w){return w[0];}).join('')+'</i>'+r.n+'</span></td><td style="font-family:var(--mono)">'+r.ph+'</td><td class="num">'+r.v+'</td><td>'+(r.last?(days===0?'сегодня':days+' дн. назад'):'—')+'</td><td class="num">'+rub(r.sum)+'</td><td>'+tag+'</td></tr>';}).join(''):'<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:32px">Никого не нашли. Проверьте написание имени или номера.</td></tr>';
+    }
+    draw();document.getElementById('q').oninput=function(e){V.q=e.target.value;draw();};
+  }
+
+  // Stats
+  function stats(){
+    bar.innerHTML='<div><h1>Аналитика</h1><span class="sub">Последние 14 дней</span></div>';
+    var days=[];for(var k=-13;k<=0;k++){var d=new Date(today);d.setDate(d.getDate()+k);var l=genDay(d).filter(function(b){return b.st!=='cancel';});days.push({d:d,rev:l.reduce(function(s,b){return s+svc(b.s).p;},0),n:l.length});}
+    save();
+    var max=Math.max.apply(null,days.map(function(x){return x.rev;})),top=Math.ceil(max/10000)*10000||10000;
+    var W=640,H=260,L=48,B=28,T=16,cw=(W-L-8)/days.length;
+    var svg='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Выручка по дням">';
+    for(var g=0;g<=4;g++){var v=top/4*g,y=H-B-(H-B-T)*g/4;svg+='<line x1="'+L+'" x2="'+(W-8)+'" y1="'+y+'" y2="'+y+'" stroke="var(--line)"/><text x="'+(L-8)+'" y="'+(y+4)+'" text-anchor="end">'+(v/1000)+'к</text>';}
+    days.forEach(function(x,i){var h=(H-B-T)*x.rev/top,xx=L+i*cw+cw*.18,w=cw*.64,last=i===days.length-1;svg+='<rect x="'+xx+'" y="'+(H-B-h)+'" width="'+w+'" height="'+h+'" rx="3" fill="'+(last?'var(--acc)':'#d9d7d0')+'"><title>'+x.d.toLocaleDateString('ru-RU')+': '+rub(x.rev)+'</title></rect>';if(i%2===days.length%2||last)svg+='<text x="'+(xx+w/2)+'" y="'+(H-8)+'" text-anchor="middle"'+(last?' class="lbl"':'')+'>'+x.d.getDate()+'.'+String(x.d.getMonth()+1).padStart(2,'0')+'</text>';});
+    svg+='</svg>';
+    var total=days.reduce(function(s,x){return s+x.rev;},0),cnt=days.reduce(function(s,x){return s+x.n;},0);
+    var bySvc={};days.forEach(function(x){genDay(x.d).forEach(function(b){if(b.st==='cancel')return;bySvc[b.s]=(bySvc[b.s]||0)+svc(b.s).p;});});
+    var rank=Object.keys(bySvc).map(function(k){return {s:svc(k),v:bySvc[k]};}).sort(function(a,b){return b.v-a.v;}).slice(0,6),rmax=rank.length?rank[0].v:1;
+    content.innerHTML='<div class="kpis"><div class="kpi"><span>Выручка за 14 дней</span><b>'+rub(total)+'</b></div><div class="kpi"><span>Визитов</span><b>'+cnt+'</b></div><div class="kpi"><span>Средний чек</span><b>'+rub(Math.round(total/Math.max(1,cnt)/10)*10)+'</b></div><div class="kpi"><span>Выручка сегодня</span><b>'+rub(days[days.length-1].rev)+'</b></div></div>'+
+      '<div class="an"><div class="card"><div class="card-h"><h2>Выручка по дням</h2><span style="color:var(--muted);font-size:12px">наведите на столбец</span></div><div class="chart">'+svg+'</div></div><div class="card"><div class="card-h"><h2>Топ услуг по выручке</h2></div><div class="rank">'+rank.map(function(r){return '<div><span class="r"><span>'+r.s.n+'</span><b>'+rub(r.v)+'</b></span><span class="meter"><i style="width:'+(r.v/rmax*100)+'%;--cb:'+KC[r.s.k][1]+'"></i></span></div>';}).join('')+'</div></div></div>';
+  }
+
+  function services(){
+    bar.innerHTML='<div><h1>Услуги</h1><span class="sub">'+SVC.length+' услуг у '+MASTERS.length+' мастеров</span></div>';
+    content.innerHTML='<div class="svc-grid">'+SVC.map(function(s){var m=MASTERS.filter(function(x){return x.id===s.m;})[0];return '<div class="svc" style="--cb:'+KC[s.k][1]+'"><b style="font-size:15px">'+s.n+'</b><span class="r"><span>Длительность</span><b>'+s.d+' мин</b></span><span class="r"><span>Цена</span><b>'+rub(s.p)+'</b></span><span class="r"><span>Мастер</span><span style="color:var(--ink)">'+m.n+'</span></span></div>';}).join('')+'</div>';
+  }
+
+  function toast(t){var el=document.createElement('div');el.className='toast';el.setAttribute('role','status');el.textContent=t;document.body.append(el);setTimeout(function(){el.remove();},1800);}
+  document.querySelectorAll('.nav button').forEach(function(b){b.onclick=function(){show(b.dataset.v);};});
+  render();save();
+})();
+</script>
+
+</body></html>
